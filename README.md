@@ -6,7 +6,7 @@
 
 ```R
 devtools::load_all()
-remotes::install_github("nteeto/yonder")
+remotes::install_github("nteetor/yonder")
 
 App(
   Component(
