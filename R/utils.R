@@ -2,7 +2,7 @@ as_observer <- function(x, ...) {
   UseMethod("as_observer")
 }
 
-as_observer.function <- function(x, ...) {
+as_observer.function <- function(x, ..., .install = caller_env()) {
   f_env <- fn_env(x)
   f_contents <- fn_body(x)
   f_args <- fn_fmls(x)
@@ -13,11 +13,16 @@ as_observer.function <- function(x, ...) {
     call2("<-", sym(nm), val)
   })
 
+  f_scopes <- list(
+    expr(input <- getDefaultReactiveDomain()$input),
+    expr(output <- getDefaultReactiveDomain()$output)
+  )
+
   shiny::observeEvent(
     eventExpr = f_trigger,
     event.quoted = TRUE,
-    # event.env = ???,  # TBD
-    handlerExpr = call2("{", !!!f_assigns, !!!f_contents),
+    event.env = .install,
+    handlerExpr = call2("{", !!!f_scopes, !!!f_assigns, !!!f_contents),
     handler.quoted = TRUE,
     handler.env = f_env
   )

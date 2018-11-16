@@ -45,10 +45,10 @@ Component <- function(..., template, export) {
   values <- args[names2(args) != ""]
   component_env <- new_environment(values, parent = caller_env())
 
-  observers <- args[vapply(args, is_function, logical(1))]
-  observers <- lapply(observers, function(obs) {
-    fn_env(obs) <- env_clone(fn_env(obs), component_env)
-    obs
+  funs <- args[vapply(args, is_function, logical(1))]
+  funs <- lapply(funs, function(fun) {
+    fn_env(fun) <- env_clone(fn_env(fun), component_env)
+    fun
   })
 
   this <- env(
@@ -71,18 +71,9 @@ Component <- function(..., template, export) {
       }
     }
 
-    if (length(observers)) {
-      for (obs in observers) {
-        event <- call2("c", !!!fn_fmls(obs))
-
-        observeEvent(
-          eventExpr = event,
-          event.quoted = TRUE,
-          event.env = c_env,
-          handlerExpr = fn_body(obs),
-          handler.quoted = TRUE,
-          handler.env = fn_env(obs)
-        )
+    if (length(funs)) {
+      for (fun in funs) {
+        as_observer(fun, .install = c_env)
       }
     }
   }
