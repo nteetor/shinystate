@@ -14,9 +14,6 @@ App(
     static = "A static string",
     function(num = input$click) {
       print(paste(static, num))
-
-      # Interestingly, `static` is visible, but `input$click` is not
-      # (not intentional)
     }
   )
 )
